@@ -20,17 +20,39 @@ input_data['new_model'] = list(map(lambda x: 1 if pre_model.count(x) == 0 else 0
 final_data['new_model'] = list(map(lambda x: 1 if pre_model.count(x) == 0 else 0,final_data['model']))
 def prepare(data):
     #对数据进行预处理，将各个属性转为数值特征
-    data['date'] = list(map(lambda x,y:str(x)+"."+str(y),data['regYear'],data['regMonth']))
+    data['date'] = list(
+        map(
+            lambda x, y: f"{str(x)}.{str(y)}",
+            data['regYear'],
+            data['regMonth'],
+        )
+    )
+
     data['date'] = pd.to_datetime(data['date'])
     if 'forecastVolum' in list(data.columns):
         data = data.drop(['forecastVolum'],axis=1)
     if 'province' in list(data.columns):
-        pro_label = dict(zip(sorted(list(set(data['province']))), range(0, len(set(data['province'])))))
-    model_label = dict(zip(sorted(list(set(data['model']))), range(0, len(set(data['model'])))))
+        pro_label = dict(
+            zip(
+                sorted(list(set(data['province']))),
+                range(len(set(data['province']))),
+            )
+        )
+
+    model_label = dict(
+        zip(sorted(list(set(data['model']))), range(len(set(data['model']))))
+    )
+
     if 'bodyType' in list(data.columns):
-       body_label = dict(zip(sorted(list(set(data['bodyType']))), range(0, len(set(data['bodyType'])))))
-       data['body_id'] = data['bodyType'].map(body_label)
-       data=data.drop(['bodyType'],axis=1)
+        body_label = dict(
+            zip(
+                sorted(list(set(data['bodyType']))),
+                range(len(set(data['bodyType']))),
+            )
+        )
+
+        data['body_id'] = data['bodyType'].map(body_label)
+        data=data.drop(['bodyType'],axis=1)
     if 'province' in list(data.columns):
         data['pro_id'] = data['province'].map(pro_label)
     data['model_id'] = data['model'].map(model_label)
